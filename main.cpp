@@ -69,6 +69,21 @@ int main (int argc, char* argv[]) {
                 << error.message << "\n";
         }
 
+        std::cout << "\nLogs between timestamps:\n";
+
+        std::string startTimestamp = "2026-07-18T14:22:03";
+        std::string endTimestamp = "2026-07-18T14:22:06";
+
+        std::vector<LogEntry> logsInRange = analyser.filterByTimestamp(logs, startTimestamp, endTimestamp);
+
+        for (const LogEntry& log : logsInRange) {
+            std::cout
+                << log.timestamp << " "
+                << severityToString(log.severity) << " "
+                << log.component << " "
+                << log.message << "\n";
+        }
+
         return 0;
     } catch (const std::exception& e){
         std::cerr << "Application error: " << e.what() << "\n";

@@ -40,3 +40,25 @@ std::vector<LogEntry> LogAnalyser::filterBySeverity(
 
     return filtered;
 }
+
+//only works if the timestamps are in a format that allows for lexicographical comparison (e.g., ISO 8601).
+std::vector<LogEntry> LogAnalyser::filterByTimestamp(
+    const std::vector<LogEntry>& logs,
+    const std::string& startTimeStamp,
+    const std::string& endTimeStamp
+) const {
+    std::vector<LogEntry> filtered;
+
+    if (startTimeStamp > endTimeStamp) {
+        return filtered;
+    }
+
+    for (const LogEntry& log : logs) {
+        if (log.timestamp >= startTimeStamp && log.timestamp <= endTimeStamp){
+            filtered.push_back(log);
+        }
+    }
+
+    return filtered;
+}
+
