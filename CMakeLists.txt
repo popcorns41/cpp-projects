@@ -2,7 +2,14 @@ cmake_minimum_required(VERSION 3.20)
 
 project(DevToolLogInspector)
 
-add_executable(log_inspector main.cpp)
+add_executable(log_inspector
+    main.cpp
+    src/FileLogSource.cpp
+    src/LogParser.cpp
+    src/LogAnalyser.cpp
+)
+
+target_include_directories(log_inspector PRIVATE include)
 
 target_compile_features(log_inspector PRIVATE cxx_std_17)
 

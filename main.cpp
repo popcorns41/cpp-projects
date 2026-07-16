@@ -1,29 +1,77 @@
-#include <fstream>
+#include "FileLogSource.h"
+#include "LogAnalyser.h"
+#include "LogParser.h"
+
 #include <iostream>
-#include <string>
+#include <memory>
 #include <string>
 #include <vector>
 
-int main() {
-    std::ifstream file("../data/sample_logs.txt");
+int main (int argc, char* argv[]) {
 
-    if (!file.is_open()){
-        std::cerr << "Failed to open log file.\n";
+    if (argc != 2){
+        std::cerr << "Usage: log_inspector <log_file_path\n";
         return 1;
     }
 
-    std::vector<std::string> lines;
-    std::string line;
+    std::string filePath = argv[1];
 
-    while (std::getline(file, line)) {
-        lines.push_back(line);
+
+    try {
+        std::unique_ptr<ILogSource> source = 
+            std::make_unique<FileLogSource>(filePath);
+
+        LogParser parser;
+        LogAnalyser analyser;
+
+        std::vector<std::string> lines = source -> readLines();
+        std::vector<LogEntry> logs;
+
+        int malformedCount = 0;
+
+        for (const std::string& line : lines) {
+            ParseResult result = parser.parseLine(line);
+
+            if (result.entry.has_value()) {
+                logs.push_back(result.entry.value());
+            } else {
+                malformedCount++;
+                std::cerr << "Skipped line: " << result.errorMessage << "\n";
+                std::cerr << "Line content: " << line << "\n\n";
+            }
+        }
+
+        std::cout << "Loaded " << logs.size() << " valid log entries.\n";
+        std::cout << "Ignored " << malformedCount << " malformed log lines.\n\n";
+
+        std::cout << "Log count by severity:\n";
+        auto severityCounts = analyser.countBySeverity(logs);
+
+        for (const auto& [severity, count]: severityCounts) {
+            std::cout << severity << ": " << count << "\n";
+        }
+
+        std::cout << "\nErrors by component:\n";
+        auto errorCounts = analyser.countErrorByComponent(logs);
+
+        for (const auto& [component, count] : errorCounts){
+            std::cout << component << ": " << count << "\n";
+        }
+
+        std::cout << "\nError logs:\n";
+        std::vector<LogEntry> errors = analyser.filterBySeverity(logs, Severity::Error);
+
+        for (const LogEntry& error : errors) {
+            std::cout
+                << error.timestamp << " "
+                << severityToString(error.severity) << " "
+                << error.component << " "
+                << error.message << "\n";
+        }
+
+        return 0;
+    } catch (const std::exception& e){
+        std::cerr << "Application error: " << e.what() << "\n";
+        return 1;
     }
-
-    std::cout << "Loaded " << lines.size() << " log lines.\n\n";
-
-    for (const std::string& logLine : lines) {
-        std::cout << logLine << "\n";
-    }
-
-    return 0;
 }
