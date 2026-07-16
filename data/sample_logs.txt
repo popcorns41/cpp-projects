@@ -1,0 +1,6 @@
+2026-07-18T14:22:01 INFO Renderer Frame started
+2026-07-18T14:22:02 WARN Network Packet delay detected
+2026-07-18T14:22:03 ERROR AssetLoader Failed to load texture player.png
+2026-07-18T14:22:04 ERROR Network Connection timeout
+2026-07-18T14:22:05 INFO Renderer Frame completed
+2026-07-18T14:22:06 WARN Input Controller latency spike detected
