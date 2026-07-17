@@ -5,7 +5,7 @@ std::string statusToString(DeviceStatus status) {
         case DeviceStatus::Online:
             return "Online";
         case DeviceStatus::Offline:
-            return "Offlien";
+            return "Offline";
         case DeviceStatus::Busy:
             return "Busy";
         case DeviceStatus::Error:

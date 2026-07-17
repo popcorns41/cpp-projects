@@ -31,6 +31,10 @@ std::vector<Device> SimulatedDeviceClient::listDevices() const {
     return devices;
 }
 
+bool SimulatedDeviceClient::rebootDevice(const std::string& id) {
+    return getDeviceById(id).has_value();
+}
+
 std::optional<Device> SimulatedDeviceClient::getDeviceById(
     const std::string& id
 ) const {

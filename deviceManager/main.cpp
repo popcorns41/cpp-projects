@@ -1,4 +1,5 @@
 #include "SimulatedDeviceClient.h"
+#include "DeviceManager.h"
 
 #include <exception>
 #include <iostream>
@@ -10,6 +11,7 @@ void printUsage() {
     std::cout << "Usage:\n";
     std::cout << "  device_manager list\n";
     std::cout << "  device_manager status <device_id>\n";
+    std::cout << " device_manager reboot <device_id>\n";
 }
 
 void printDevice(const Device& device) {
@@ -26,6 +28,8 @@ int main (int argc, char* argv[]) {
         std::unique_ptr<IDeviceClient> deviceClient =
             std::make_unique<SimulatedDeviceClient>("../data/devices.txt");
         
+        DeviceManager deviceManager(std::move(deviceClient));
+        
         if (argc < 2) {
             printUsage();
             return 1;
@@ -33,15 +37,18 @@ int main (int argc, char* argv[]) {
 
         std::string command = argv[1];
 
+        // ====== list command ======
+        
         if (command == "list") {
-            std::vector<Device> devices = deviceClient->listDevices();
-
+            std::vector<Device> devices = deviceManager.listDevices();
             for (const Device& device : devices) {
                 printDevice(device);
             }
 
             return 0;
         }
+        
+        // ====== status command ======
 
         if (command == "status") {
             if (argc != 3) {
@@ -53,7 +60,7 @@ int main (int argc, char* argv[]) {
             std::string deviceId = argv[2];
 
             std::optional<Device> device = 
-                deviceClient -> getDeviceById(deviceId);
+                deviceManager.getDeviceStatus(deviceId);
             
             if (!device.has_value()) {
                 std::cerr << "Error: device not found : " << deviceId << "\n";
@@ -67,7 +74,30 @@ int main (int argc, char* argv[]) {
 
             return 0;
         }
+
+        // ==== reboot command ======
+
+        if (command == "reboot") {
+            if (argc != 3) {
+                std::cerr << "Error: reboot requires a device ID.\n";
+                printUsage();
+                return 1;
+            }
+
+            std::string deviceId = argv[2];
+
+            OperationResult result = deviceManager.rebootDevice(deviceId);
+
+            if (!result.success) {
+                std::cerr << "Error: " << result.message << "\n";
+                return 1;
+            }
+
+            std::cout << result.message << "\n";
+            return 0;
+        }
         
+        // ====== unknown command ======
 
         std::cerr << "Error: unknown command: " << command << "\n";
         printUsage();

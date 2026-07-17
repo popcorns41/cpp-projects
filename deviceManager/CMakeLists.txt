@@ -6,6 +6,8 @@ add_executable(device_manager
     main.cpp
     src/DeviceStatus.cpp
     src/SimulatedDeviceClient.cpp
+    src/DeviceManager.cpp
+    include/OperationResult.h
 )
 
 target_include_directories(device_manager PRIVATE include)

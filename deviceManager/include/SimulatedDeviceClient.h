@@ -14,6 +14,8 @@ class SimulatedDeviceClient : public IDeviceClient {
         std::optional<Device> getDeviceById(
             const std::string& id
         ) const override;
+
+        bool rebootDevice(const std::string& id) override;
     
         private:
             std::string devicesFilePath_;
