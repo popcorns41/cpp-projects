@@ -22,6 +22,11 @@ class SimulatedDeviceClient : public IDeviceClient {
             const std::string& buildPath
         ) override;
 
+        bool setStatus(
+            const std::string& deviceId,
+            const DeviceStatus newStatus
+        ) override;
+
         private:
             std::string devicesFilePath_;
             std::optional<Device> parseDeviceLine(

@@ -108,3 +108,42 @@ OperationResult DeviceManager::deployBuild(
         "Build deployed successfully to device: " + deviceId
     };
 }
+
+OperationResult DeviceManager::setStatus(
+    const std::string& deviceId,
+    const std::string& statusText
+) {
+
+    DeviceStatus newStatus = statusFromString(statusText);
+
+    if (newStatus == DeviceStatus::Unknown) {
+        return OperationResult{
+            false,
+            "Invalid device status: " + statusText
+        };
+    }
+
+    std::optional<Device> device = deviceClient_->getDeviceById(deviceId);
+
+    if (!device.has_value()) {
+        return OperationResult{
+            false,
+            "Device not found: " + deviceId
+        };
+    }
+
+    bool updated = deviceClient_->setStatus(deviceId, newStatus);
+
+    if (!updated) {
+        return OperationResult{
+            false,
+            "Failed to update device status: " + deviceId
+        };
+    }
+
+
+    return OperationResult{
+        true,
+        "Device " + deviceId + " status updated to " + statusToString(newStatus)
+    };
+}

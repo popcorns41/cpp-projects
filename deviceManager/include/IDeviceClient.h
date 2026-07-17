@@ -17,6 +17,7 @@ class IDeviceClient {
         ) const = 0;
         virtual bool rebootDevice(const std::string& id) = 0;
         virtual bool deployBuild(const std::string& deviceId, const std::string& buildPath) = 0;
+        virtual bool setStatus(const std::string& deviceId, DeviceStatus newStatus) = 0;
         //To be implemented <3
 //         virtual std::vector<std::string> fetchLogs(const std::string& id) const = 0;
 };

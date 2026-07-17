@@ -11,8 +11,9 @@ void printUsage() {
     std::cout << "Usage:\n";
     std::cout << "  device_manager list\n";
     std::cout << "  device_manager status <device_id>\n";
-    std::cout << " device_manager reboot <device_id>\n";
+    std::cout << "  device_manager reboot <device_id>\n";
     std::cout << "  device_manager deploy <device_id> <build_path>\n";
+    std::cout << "  device_manager set-status <device_id> <new_status>\n";
 }
 
 void printDevice(const Device& device) {
@@ -114,6 +115,30 @@ int main (int argc, char* argv[]) {
                 deviceManager.deployBuild(deviceId, buildPath);
             
             if(!result.success) {
+                std::cerr << "Error: " << result.message << "\n";
+                return 1;
+            }
+
+            std::cout << result.message << "\n";
+            return 0;
+        }
+
+        // ====== set-status command ======
+
+        if (command == "set-status") {
+            if (argc != 4) {
+                std::cerr << "Error: set-status requires a device ID and new status.\n";
+                printUsage();
+                return 1;
+            }
+
+            std::string deviceId = argv[2];
+            std::string statusText = argv[3];
+
+            OperationResult result =
+                deviceManager.setStatus(deviceId, statusText);
+
+            if (!result.success) {
                 std::cerr << "Error: " << result.message << "\n";
                 return 1;
             }

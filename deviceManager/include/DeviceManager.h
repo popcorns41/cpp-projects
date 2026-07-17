@@ -25,7 +25,12 @@ class DeviceManager{
             const std::string& deviceId,
             const std::string& buildPath
         );
-        
+
+        OperationResult setStatus(
+            const std::string& deviceId,
+            const std::string& statusText
+        );
+
     private:
         std::unique_ptr<IDeviceClient> deviceClient_;
 };

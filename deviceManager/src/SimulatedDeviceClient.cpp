@@ -58,6 +58,45 @@ bool SimulatedDeviceClient::deployBuild(
     return getDeviceById(deviceId).has_value();
 }
 
+bool SimulatedDeviceClient::setStatus(
+    const std::string& deviceId,
+    DeviceStatus newStatus
+) {
+    std::vector<Device> devices = listDevices();
+
+    bool foundDevice = false;
+
+    for (Device& device : devices) {
+        if (device.id == deviceId) {
+            device.status = newStatus;
+            foundDevice = true;
+            break;
+        }
+    }
+
+    if (!foundDevice) {
+        return false;
+    }
+
+    std::ofstream file(devicesFilePath_,std::ios::trunc);
+
+    if (!file.is_open()) {
+        throw std::runtime_error(
+            "Failed to write to devices file: " + devicesFilePath_
+        );
+    }
+
+    for (const Device& device : devices) {
+        file
+            << device.id << " "
+            << device.name << " "
+            << statusToString(device.status) << " "
+            << device.firmwareVersion << "\n";
+    }
+
+    return true;
+}
+
 std::optional<Device> SimulatedDeviceClient::parseDeviceLine(
     const std::string& line
 ) const {
