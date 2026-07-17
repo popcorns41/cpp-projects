@@ -16,7 +16,12 @@ class SimulatedDeviceClient : public IDeviceClient {
         ) const override;
 
         bool rebootDevice(const std::string& id) override;
-    
+        
+        bool deployBuild(
+            const std::string& deviceId,
+            const std::string& buildPath
+        ) override;
+
         private:
             std::string devicesFilePath_;
             std::optional<Device> parseDeviceLine(

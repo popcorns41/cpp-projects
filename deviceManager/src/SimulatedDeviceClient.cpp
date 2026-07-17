@@ -49,6 +49,15 @@ std::optional<Device> SimulatedDeviceClient::getDeviceById(
     return std::nullopt;
 }
 
+bool SimulatedDeviceClient::deployBuild(
+    const std::string& deviceId,
+    const std::string& buildPath
+) {
+    (void)buildPath;
+
+    return getDeviceById(deviceId).has_value();
+}
+
 std::optional<Device> SimulatedDeviceClient::parseDeviceLine(
     const std::string& line
 ) const {

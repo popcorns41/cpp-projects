@@ -1,5 +1,5 @@
 #include "DeviceManager.h"
-
+#include <filesystem>
 #include <stdexcept>
 #include <utility>
 
@@ -50,5 +50,61 @@ OperationResult DeviceManager::rebootDevice(const std::string& deviceId) {
     return OperationResult{
         true,
         "Reboot command sent successfully to device: " + deviceId
+    };
+}
+
+OperationResult DeviceManager::deployBuild(
+    const std::string& deviceId,
+    const std::string& buildPath
+) {
+    std::optional<Device> device = deviceClient_->getDeviceById(deviceId);
+
+    if (!device.has_value()) {
+        return OperationResult{
+            false,
+            "Device not found: " + deviceId
+        };
+    }
+
+    if (device->status == DeviceStatus::Offline) { 
+        return OperationResult{
+            false,
+            "Cannot deploy to offline device: " + deviceId
+        };
+    }
+
+     if (device->status == DeviceStatus::Busy) {
+        return OperationResult{
+            false,
+            "Cannot deploy to busy device: " + deviceId
+        };
+    }
+
+    if (device->status == DeviceStatus::Error) {
+        return OperationResult{
+            false,
+            "Cannot deploy to device in error state: " + deviceId
+        };
+    }
+
+    if (!std::filesystem::exists(buildPath)) {
+        return OperationResult{
+            false,
+            "Build file not found: " + buildPath
+        };
+    }
+
+    bool deploySent = deviceClient_->deployBuild(deviceId, buildPath);
+
+    if (!deploySent) {
+        return OperationResult{
+            false,
+            "Failed to deploy build to device: " + deviceId
+        };
+    }
+
+    return OperationResult{
+        true,
+        "Build deployed successfully to device: " + deviceId
     };
 }

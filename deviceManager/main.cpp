@@ -12,6 +12,7 @@ void printUsage() {
     std::cout << "  device_manager list\n";
     std::cout << "  device_manager status <device_id>\n";
     std::cout << " device_manager reboot <device_id>\n";
+    std::cout << "  device_manager deploy <device_id> <build_path>\n";
 }
 
 void printDevice(const Device& device) {
@@ -38,7 +39,7 @@ int main (int argc, char* argv[]) {
         std::string command = argv[1];
 
         // ====== list command ======
-        
+
         if (command == "list") {
             std::vector<Device> devices = deviceManager.listDevices();
             for (const Device& device : devices) {
@@ -89,6 +90,30 @@ int main (int argc, char* argv[]) {
             OperationResult result = deviceManager.rebootDevice(deviceId);
 
             if (!result.success) {
+                std::cerr << "Error: " << result.message << "\n";
+                return 1;
+            }
+
+            std::cout << result.message << "\n";
+            return 0;
+        }
+
+        // ====== deploy command ======
+
+        if (command == "deploy") {
+            if (argc != 4) {
+                std::cerr << "Error: deploy requires a device ID and build path.\n";
+                printUsage();
+                return 1;
+            }
+
+            std::string deviceId = argv[2];
+            std::string buildPath = argv[3];
+
+            OperationResult result = 
+                deviceManager.deployBuild(deviceId, buildPath);
+            
+            if(!result.success) {
                 std::cerr << "Error: " << result.message << "\n";
                 return 1;
             }

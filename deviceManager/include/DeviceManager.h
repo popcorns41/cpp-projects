@@ -20,6 +20,11 @@ class DeviceManager{
         ) const;
         
         OperationResult rebootDevice(const std::string& deviceId);
+
+        OperationResult deployBuild(
+            const std::string& deviceId,
+            const std::string& buildPath
+        );
         
     private:
         std::unique_ptr<IDeviceClient> deviceClient_;
